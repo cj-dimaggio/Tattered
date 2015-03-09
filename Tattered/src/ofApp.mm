@@ -37,6 +37,9 @@ ofFbo fireBuffer2;
 // The final fire texture
 ofFbo fireTexture;
 
+// The texture of the manipulated image
+ofFbo imageBurnt;
+
 // User interaction variables
 bool singletouch = false;
 bool twoTouch = false;
@@ -122,10 +125,7 @@ void ofApp::setup(){
     
     baseImage.loadImage("stock-photo.jpg");
     scaleImageToFit(&baseImage);
-    imagePlane.set(ofGetWidth(), ofGetHeight(), 50, 50);
-    
-    imagePlane.mapTexCoordsFromTexture(baseImage.getTextureReference());
-    
+
     fireSpreadShader.load("Shaders/fireSpread");
     fireCoolShader.load("Shaders/fireCool");
     burnShader.load("burn");
@@ -135,6 +135,7 @@ void ofApp::setup(){
     fireBuffer1.allocate(ofGetWidth(), ofGetHeight());
     fireBuffer2.allocate(ofGetWidth(), ofGetHeight());
     fireTexture.allocate(ofGetWidth(), ofGetHeight());
+    imageBurnt.allocate(ofGetWidth(), ofGetHeight());
     
     // Zero out the buffers
     fireBuffer1.begin();
@@ -149,6 +150,15 @@ void ofApp::setup(){
     ofClear(0, 0, 0, 0);
     fireTexture.end();
 
+    imageBurnt.begin();
+    ofClear(0, 0, 0, 0);
+    imageBurnt.end();
+    
+    // Map the burntImage to a uv map
+    imagePlane.set(ofGetWidth(), ofGetHeight(), 50, 50);
+    imagePlane.mapTexCoordsFromTexture(imageBurnt.getTextureReference());
+    
+    
     // Randomly generate the noise texture
     noise.allocate(ofGetWidth(), ofGetHeight(), OF_IMAGE_GRAYSCALE);
     
@@ -183,15 +193,17 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
-    /*generateFireTexture();
+    generateFireTexture();
     
+    imageBurnt.begin();
     burnShader.begin();
     burnShader.setUniformTexture("fireTex", fireTexture.getTextureReference(), 1);
     fireSpreadShader.setUniformTexture("noiseTex", noise.getTextureReference(), 2);
     baseImage.draw(0, 0);
-    burnShader.end();*/
+    burnShader.end();
+    imageBurnt.end();
     
-    baseImage.getTextureReference().bind();
+    imageBurnt.getTextureReference().bind();
     pinchShader.begin();
     pinchShader.setUniform1f("pullForce", pullForce);
     pinchShader.setUniform2f("midPoint", midPoint.x - ofGetWidth() / 2.0, midPoint.y - ofGetHeight() / 2.0);
@@ -202,8 +214,7 @@ void ofApp::draw(){
     ofPopMatrix();
     
     pinchShader.end();
-    baseImage.getTextureReference().unbind();
-    
+    imageBurnt.getTextureReference().unbind();
 }
 
 //--------------------------------------------------------------
