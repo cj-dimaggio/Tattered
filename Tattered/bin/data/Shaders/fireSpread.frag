@@ -14,7 +14,7 @@ uniform vec2 texSize;
 varying vec2 texCoordVarying;
 
 // CONSTANTS
-const float THRESHOLD = 0.7;
+const float THRESHOLD = 0.5;
 const int THICKNESS = 2;
 const vec4 BLACK = vec4(1, 1, 1, 1);
 const vec4 RED = vec4(1, 0, 0, 1);
@@ -43,7 +43,6 @@ vec2 getOffSet(int offSetX, int offSetY) {
 **/
 float rand(int offSetX, int offSetY) {
     return texture2D(noiseTex, texCoordVarying + getOffSet(offSetX, offSetY)).x;
-    return 0.6;
 }
 
 void main()

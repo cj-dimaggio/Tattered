@@ -8,6 +8,7 @@
  a proof-of-concept
 **/
 ofImage baseImage;
+
 // Texture to be used to generate random values within shaders
 ofImage noise;
 
@@ -17,6 +18,9 @@ ofShader fireSpreadShader;
 // This shader has the simple task of turning green texels
 // to RED and RED texels to blue
 ofShader fireCoolShader;
+
+// This is the shader that actually applies the fire texture to the photo
+ofShader burnShader;
 
 // Make sure texture maps correctly
 ofShader mapper;
@@ -29,10 +33,31 @@ ofFbo fireTexture;
 
 
 // User interaction variables
-bool touching = false;
+bool singletouch = false;
+bool twoTouch = false;
 
+// for one finger touches
 float cX;
 float cY;
+
+// for two finger touches
+float cX1;
+float cY1;
+float cX2;
+float cY2;
+
+void scaleImageToFit(ofImage* image) {
+    // The picture is in portrait and we should determain the scale ratio based on this
+    if(image->height > image->width) {
+        double scaleRatio = (double) ofGetScreenHeight() / image->height;
+        image->resize(image->width * scaleRatio, ofGetScreenHeight());
+    } else {
+        // Otherwise, we are in landscape (or technically, a perfect square, in which case it shouldn't
+        // matter) so we scale based on the width
+        double scaleRatio = ofGetScreenWidth() / image->width;
+        image->resize(ofGetScreenWidth(), image->height * scaleRatio);
+    }
+}
 
 void generateFireTexture() {
     fireBuffer1.begin();
@@ -43,9 +68,9 @@ void generateFireTexture() {
     fireTexture.draw(0, 0);
     mapper.end();
     
-    if (touching) {
+    if (singletouch) {
         ofSetColor(255, 0, 0);
-        ofCircle(cX, cY, 4);
+        ofCircle(cX, cY, 10);
     }
     fireBuffer1.end();
     
@@ -81,8 +106,12 @@ void generateFireTexture() {
 void ofApp::setup(){
     ofBackground(0);
     
+    baseImage.loadImage("stock-photo.jpg");
+    scaleImageToFit(&baseImage);
+    
     fireSpreadShader.load("Shaders/fireSpread");
     fireCoolShader.load("Shaders/fireCool");
+    burnShader.load("burn");
     mapper.load("Shaders/map");
     
     fireBuffer1.allocate(ofGetWidth(), ofGetHeight());
@@ -127,9 +156,11 @@ void ofApp::draw(){
     
     generateFireTexture();
     
-    mapper.begin();
-    fireTexture.draw(0,0);
-    mapper.end();
+    burnShader.begin();
+    burnShader.setUniformTexture("fireTex", fireTexture.getTextureReference(), 1);
+    fireSpreadShader.setUniformTexture("noiseTex", noise.getTextureReference(), 2);
+    baseImage.draw(0, 0);
+    burnShader.end();
 }
 
 //--------------------------------------------------------------
@@ -139,22 +170,46 @@ void ofApp::exit(){
 
 //--------------------------------------------------------------
 void ofApp::touchDown(ofTouchEventArgs & touch){
-    touching = true;
-    cX = touch.x;
-    cY = touch.y;
+    if (touch.numTouches == 1) {
+        singletouch = true;
+        cX = touch.x;
+        cY = touch.y;
+    } else if (touch.numTouches == 2) {
+        if (!twoTouch) {
+            twoTouch = true;
+            cX1 = touch.x;
+            cY1 = touch.y;
+        } else {
+            twoTouch = false;
+            cX2 = touch.x;
+            cY2 = touch.y;
+        }
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::touchMoved(ofTouchEventArgs & touch){
-    touching = true;
-    cX = touch.x;
-    cY = touch.y;
+    if (touch.numTouches == 1) {
+        singletouch = true;
+        cX = touch.x;
+        cY = touch.y;
+    } else if (touch.numTouches == 2) {
+        if (!twoTouch) {
+            twoTouch = true;
+            cX1 = touch.x;
+            cY1 = touch.y;
+        } else {
+            twoTouch = false;
+            cX2 = touch.x;
+            cY2 = touch.y;
+        }
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::touchUp(ofTouchEventArgs & touch){
-    touching = false;
-
+    singletouch = false;
+    twoTouch = false;
 }
 
 //--------------------------------------------------------------
@@ -164,8 +219,8 @@ void ofApp::touchDoubleTap(ofTouchEventArgs & touch){
 
 //--------------------------------------------------------------
 void ofApp::touchCancelled(ofTouchEventArgs & touch){
-    touching = false;
-    
+    singletouch = false;
+    twoTouch = false;
 }
 
 //--------------------------------------------------------------
