@@ -37,7 +37,7 @@ void ofApp::generateFireTexture() {
      * GREEN texels turn RED, and can cary on the burn until
      all are extinguished
      **/
-    // This shader spread the burning (texels ajacent to RED texels might become green)
+    // This shader spreads the burning (texels ajacent to RED texels might become green)
     fireSpreadShader.begin();
     fireSpreadShader.setUniform2f("texSize", fireBuffer1.getHeight(), fireBuffer1.getHeight());
     fireSpreadShader.setUniformTexture("noiseTex", noise.getTextureReference(), 1);
@@ -130,8 +130,13 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
+    // There's no reason why we should continue running this shader once the fire propegation
+    // has died out. We would save a lot of performance if we conditioned this to run only
+    // if there's something for it to do
     generateFireTexture();
     
+    // Run the final fire related shader and render it to a framebuffer so it can be further
+    // manipulated
     imageBurnt.begin();
     burnShader.begin();
     burnShader.setUniformTexture("fireTex", fireTexture.getTextureReference(), 1);
@@ -140,12 +145,20 @@ void ofApp::draw(){
     burnShader.end();
     imageBurnt.end();
     
+    // Run the UV mapped burnt image through yet another shader, this one more vertex oriented
+    // and will displace verteces based on whether the user is pinching or pulling the screen
     imageBurnt.getTextureReference().bind();
     pinchShader.begin();
     pinchShader.setUniform1f("pullForce", pullForce);
+    
+    // Note that a UV plane, because it's technically a 3d object, is oriented upon it's midpoint
+    // As opposed to the top left corner in traditional 2d rendering, to compensate for this, we need
+    // to offset the midpoint
     pinchShader.setUniform2f("midPoint", midPoint.x - ofGetWidth() / 2.0, midPoint.y - ofGetHeight() / 2.0);
     
     ofPushMatrix();
+    
+    // Same as above, we need to translate the 3d world to make it align correctly with our 2d screen
     ofTranslate(ofGetWidth()/2, ofGetHeight()/2);
     imagePlane.draw();
     ofPopMatrix();
