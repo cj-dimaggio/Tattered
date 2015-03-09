@@ -9,6 +9,9 @@
 **/
 ofImage baseImage;
 
+// The UV plane for the image
+ofPlanePrimitive imagePlane;
+
 // Texture to be used to generate random values within shaders
 ofImage noise;
 
@@ -22,6 +25,9 @@ ofShader fireCoolShader;
 // This is the shader that actually applies the fire texture to the photo
 ofShader burnShader;
 
+// Do some simple pinch and pull effects just for fun
+ofShader pinchShader;
+
 // Make sure texture maps correctly
 ofShader mapper;
 
@@ -31,20 +37,28 @@ ofFbo fireBuffer2;
 // The final fire texture
 ofFbo fireTexture;
 
-
 // User interaction variables
 bool singletouch = false;
 bool twoTouch = false;
+bool moved = false;
 
 // for one finger touches
 float cX;
 float cY;
 
 // for two finger touches
-float cX1;
-float cY1;
-float cX2;
-float cY2;
+float cX1Start;
+float cY1Start;
+float cX2Start;
+float cY2Start;
+
+float cX1Current;
+float cY1Current;
+float cX2Current;
+float cY2Current;
+
+ofVec2f midPoint;
+float pullForce;
 
 void scaleImageToFit(ofImage* image) {
     // The picture is in portrait and we should determain the scale ratio based on this
@@ -108,11 +122,15 @@ void ofApp::setup(){
     
     baseImage.loadImage("stock-photo.jpg");
     scaleImageToFit(&baseImage);
+    imagePlane.set(ofGetWidth(), ofGetHeight(), 50, 50);
+    
+    imagePlane.mapTexCoordsFromTexture(baseImage.getTextureReference());
     
     fireSpreadShader.load("Shaders/fireSpread");
     fireCoolShader.load("Shaders/fireCool");
     burnShader.load("burn");
     mapper.load("Shaders/map");
+    pinchShader.load("Shaders/pinch-pull");
     
     fireBuffer1.allocate(ofGetWidth(), ofGetHeight());
     fireBuffer2.allocate(ofGetWidth(), ofGetHeight());
@@ -147,20 +165,45 @@ void ofApp::setup(){
 
 }
 
+float calcDistance(float x1, float y1, float x2, float y2){
+    return sqrt( powf( (x2 - x1), 2 ) + powf( (y2 - y1), 2 ) );
+}
+
 //--------------------------------------------------------------
 void ofApp::update(){
+    // Calculate the pinch/pull force and midpoint if we need to
+    if (moved) {
+        midPoint.set(((cX1Current + cX2Current) / 2), ((cY1Current + cY2Current) / 2));
+        float initDist = calcDistance(cX1Start, cY1Start, cX2Start, cY2Start);
+        float curDist = calcDistance(cX1Current, cY1Current, cX2Current, cY2Current);
+        pullForce = curDist - initDist;
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     
-    generateFireTexture();
+    /*generateFireTexture();
     
     burnShader.begin();
     burnShader.setUniformTexture("fireTex", fireTexture.getTextureReference(), 1);
     fireSpreadShader.setUniformTexture("noiseTex", noise.getTextureReference(), 2);
     baseImage.draw(0, 0);
-    burnShader.end();
+    burnShader.end();*/
+    
+    baseImage.getTextureReference().bind();
+    pinchShader.begin();
+    pinchShader.setUniform1f("pullForce", pullForce);
+    pinchShader.setUniform2f("midPoint", midPoint.x - ofGetWidth() / 2.0, midPoint.y - ofGetHeight() / 2.0);
+    
+    ofPushMatrix();
+    ofTranslate(ofGetWidth()/2, ofGetHeight()/2);
+    imagePlane.draw();
+    ofPopMatrix();
+    
+    pinchShader.end();
+    baseImage.getTextureReference().unbind();
+    
 }
 
 //--------------------------------------------------------------
@@ -177,12 +220,12 @@ void ofApp::touchDown(ofTouchEventArgs & touch){
     } else if (touch.numTouches == 2) {
         if (!twoTouch) {
             twoTouch = true;
-            cX1 = touch.x;
-            cY1 = touch.y;
+            cX1Start = touch.x;
+            cY1Start = touch.y;
         } else {
             twoTouch = false;
-            cX2 = touch.x;
-            cY2 = touch.y;
+            cX2Start = touch.x;
+            cY2Start = touch.y;
         }
     }
 }
@@ -196,13 +239,14 @@ void ofApp::touchMoved(ofTouchEventArgs & touch){
     } else if (touch.numTouches == 2) {
         if (!twoTouch) {
             twoTouch = true;
-            cX1 = touch.x;
-            cY1 = touch.y;
+            cX1Current = touch.x;
+            cY1Current = touch.y;
         } else {
             twoTouch = false;
-            cX2 = touch.x;
-            cY2 = touch.y;
+            cX2Current = touch.x;
+            cY2Current = touch.y;
         }
+        moved = true;
     }
 }
 
@@ -210,17 +254,18 @@ void ofApp::touchMoved(ofTouchEventArgs & touch){
 void ofApp::touchUp(ofTouchEventArgs & touch){
     singletouch = false;
     twoTouch = false;
+    moved = false;
 }
 
 //--------------------------------------------------------------
 void ofApp::touchDoubleTap(ofTouchEventArgs & touch){
-
 }
 
 //--------------------------------------------------------------
 void ofApp::touchCancelled(ofTouchEventArgs & touch){
     singletouch = false;
     twoTouch = false;
+    moved = false;
 }
 
 //--------------------------------------------------------------

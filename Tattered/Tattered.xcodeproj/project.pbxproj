@@ -18,6 +18,8 @@
 		5B0EE0D41AADFE7600A566EA /* map.vert in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EE0D21AADFE7600A566EA /* map.vert */; };
 		5B0EE0D71AAE0A6900A566EA /* burn.frag in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EE0D51AAE0A6900A566EA /* burn.frag */; };
 		5B0EE0D81AAE0A6900A566EA /* burn.vert in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EE0D61AAE0A6900A566EA /* burn.vert */; };
+		5B0EE0DB1AAE213100A566EA /* pinch-pull.frag in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EE0D91AAE213100A566EA /* pinch-pull.frag */; };
+		5B0EE0DC1AAE213100A566EA /* pinch-pull.vert in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EE0DA1AAE213100A566EA /* pinch-pull.vert */; };
 		5B6F9BC71AAC07AC00FE24A3 /* fireSpread.frag in Resources */ = {isa = PBXBuildFile; fileRef = 5B6F9BC51AAC07AC00FE24A3 /* fireSpread.frag */; };
 		5B6F9BC81AAC07AC00FE24A3 /* fireSpread.vert in Resources */ = {isa = PBXBuildFile; fileRef = 5B6F9BC61AAC07AC00FE24A3 /* fireSpread.vert */; };
 		678E130817951530005B6D19 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 678E130717951530005B6D19 /* Icon@2x.png */; };
@@ -71,6 +73,8 @@
 		5B0EE0D21AADFE7600A566EA /* map.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = map.vert; path = bin/data/Shaders/map.vert; sourceTree = SOURCE_ROOT; };
 		5B0EE0D51AAE0A6900A566EA /* burn.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = burn.frag; path = bin/data/Shaders/burn.frag; sourceTree = SOURCE_ROOT; };
 		5B0EE0D61AAE0A6900A566EA /* burn.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = burn.vert; path = bin/data/Shaders/burn.vert; sourceTree = SOURCE_ROOT; };
+		5B0EE0D91AAE213100A566EA /* pinch-pull.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = "pinch-pull.frag"; path = "bin/data/Shaders/pinch-pull.frag"; sourceTree = SOURCE_ROOT; };
+		5B0EE0DA1AAE213100A566EA /* pinch-pull.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = "pinch-pull.vert"; path = "bin/data/Shaders/pinch-pull.vert"; sourceTree = SOURCE_ROOT; };
 		5B6F9BC51AAC07AC00FE24A3 /* fireSpread.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = fireSpread.frag; path = bin/data/Shaders/fireSpread.frag; sourceTree = SOURCE_ROOT; };
 		5B6F9BC61AAC07AC00FE24A3 /* fireSpread.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = fireSpread.vert; path = bin/data/Shaders/fireSpread.vert; sourceTree = SOURCE_ROOT; };
 		678E130717951530005B6D19 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "bin/data/Icon@2x.png"; sourceTree = "<group>"; };
@@ -177,6 +181,8 @@
 				5B0EE0D21AADFE7600A566EA /* map.vert */,
 				5B0EE0D51AAE0A6900A566EA /* burn.frag */,
 				5B0EE0D61AAE0A6900A566EA /* burn.vert */,
+				5B0EE0D91AAE213100A566EA /* pinch-pull.frag */,
+				5B0EE0DA1AAE213100A566EA /* pinch-pull.vert */,
 			);
 			name = Shaders;
 			path = src;
@@ -305,10 +311,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B0EE0DC1AAE213100A566EA /* pinch-pull.vert in Resources */,
 				5B0EE0CE1AADF3B300A566EA /* fireCool.frag in Resources */,
 				5B6F9BC71AAC07AC00FE24A3 /* fireSpread.frag in Resources */,
 				E41D3ED713B38FB500A75A5D /* Project.xcconfig in Resources */,
 				5B0EE0D81AAE0A6900A566EA /* burn.vert in Resources */,
+				5B0EE0DB1AAE213100A566EA /* pinch-pull.frag in Resources */,
 				E41D3EE613B3906D00A75A5D /* CoreOF.xcconfig in Resources */,
 				678E130817951530005B6D19 /* Icon@2x.png in Resources */,
 				678E130A17951536005B6D19 /* Icon.png in Resources */,
